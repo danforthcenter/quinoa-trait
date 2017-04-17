@@ -19,54 +19,84 @@ seed.1 <- read.csv(file="cqSeedGen1_area.csv", sep=",", header=TRUE, stringsAsFa
 seed.biomass <- read.csv(file="cqSeedBiomass.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
 
 #### user interface
-ui <- navbarPage("Quinoa Seed and Shoot Explorer",
+ui <- navbarPage("Quinoa Phenotype Explorer",
                  theme = shinytheme("spacelab"),
                  tabPanel("About",
                           fluidRow(
+                            column(9,
+                                   h4(strong("Germplasm:")),
+                                   p("A total of 383 quinoa lines were obtained from the USDA Germplasm Research Information Network National Plant Germplasm System,
+                                      from Leibniz-Institut Fur Pflanzengenetik Und Kulturpflanzenforschung (IPK) seed bank, and from collaborators at Washington State 
+                                      University (Kevin Murphy) and Brigham Young University (Jeff Maughan and Rick Jellen). All seeds from each line were imaged using 
+                                      a Nikon Coolpix L830 camera. Images were then processed and analyzed for seed area and color using PlantCV (Fahlgren et al. 2015)."),
+                                   p("Fifty of these accessions were selected as a diversity panel to examine differences in shoot growth and seed production among quinoa
+                                     varieties. Accessions were selected based on country of origin, elevation, and seed color and size. After germination, six seedlings 
+                                     per accession were transplanted into 4-in pots containing a Pro-Mix FPX soil medium and then grown in a greenhouse at 24-28C, 20-80% 
+                                     RH, and ~14.5-hr day length.")), br(), br(),
+                            column(3,
+                                   wellPanel(h4("Download F0 Seed Data"),
+                                             h5("Includes normalized area of each seed from each accession.", style="margin-left:15px"),
+                                             downloadButton('downloadSeedG0', 'Download F0 Seed')))), hr(),
+                          fluidRow(
                             column(5,
-                                   h4(strong("Shoot data:")),
-                                   p("Quinoa accessions were grown in a greenhouse and imaged using RaspberryPis for seven days.
-                                     Images were taken simultaneously from four camera angles: three side views and one top view. Images were processed and
-                                     analyzed for area and height above bound using PlantCV (Fahlgren et al. 2015)."),
-                                   p ("Above-ground fresh- and dry-weight biomass (g) were estimated from linear regression models of shoot area (cm^2) and 
-                                      height (cm). Model for fresh-weight (adjusted R^2 = 0.776): FW = 1.278e-04(all_area) + all_ht, where 'all_area' is the 
-                                      sum of above-ground plant pixel area from all four camera angles and 'all_ht' is the mean of above-ground plant pixel 
-                                      height from all camera angles. Model for dry-weight (adjusted R^2 = 0.742): DW = 8.684e-06(sides_area) + 2.723e-05(area_top), 
-                                      where 'sides_area' is the sum area of all three sides and 'area-top' is the area from top camera angle only."),
-                                   p("The heatmap presented is generated from data averaged over all replicates per time point and scaled by row."),
-                                   br(),
-                                   h4(strong("Seed data:")),
-                                   p("Seed were harvested..."),
-                                   br(),
-                                   h4(strong("Panicle data:")),
-                                   p("Infloresences were harvested...")
-                                  ),
-                            column(3, br(), wellPanel(h4("Download Raw Shoot Data"),
-                                                h5("Includes area and height for all replicates of each accession.", style="margin-left:15px"),
-                                                downloadButton('downloadRawData', 'Download Shoot Raw')),
-                                      wellPanel(h4("Download Means Shoot Data"),
-                                                h5("Includes data averaged over replicates of each accession per day.", style="margin-left:15px"),
-                                                downloadButton('downloadData', 'Download Shoot Means')), hr(),
-                                      wellPanel(h4("Download F0 Seed Data"),
-                                                h5("Includes normalized area of each seed from each accession.", style="margin-left:15px"),
-                                                downloadButton('downloadSeedG0', 'Download F0 Seed')),
-                                      wellPanel(h4("Download F1 Seed Data"),
-                                                h5("Includes seed number, normalized area, and weight for each accession.", style="margin-left:15px"),
-                                                downloadButton('downloadSeedG1', 'Download F1 Seed')), hr(),
-                                      wellPanel(h4("Download Panicle Data"),
-                                                h5("Includes panicle density and shape for each accession.", style="margin-left:15px"),
-                                                downloadButton('downloadPan', 'Download Panicle'))),
-                            column(4, br(),
+                                   h4(strong("Shoot Data:")),
+                                   p("Plants were imaged using RaspberryPis about every other day for seven days. Images of quinoa shoots were taken simultaneously from four 
+                                      camera angles: three side views and one top view. Images were processed and analyzed for area and height above bound using PlantCV. 
+                                      Above-ground fresh- and dry-weight biomass (g) were estimated from linear regression models of shoot area (cm^2) and height (cm). 
+                                      Model for fresh-weight (adjusted R^2 = 0.776): FW = 1.278e-04(all_area) + all_ht, where 'all_area' is the sum of above-ground plant 
+                                      pixel area from all four camera angles and 'all_ht' is the mean of above-ground plant pixel height from all camera angles. Model for 
+                                      dry-weight (adjusted R^2 = 0.742): DW = 8.684e-06(sides_area) + 2.723e-05(area_top), where 'sides_area' is the sum area of all three 
+                                      sides and 'area-top' is the area from top camera angle only."),
+                                   p("The heatmap presented is generated from data averaged over all replicates per time point and scaled by row.")), br(), br(),
+                            column(3,
+                                   wellPanel(h4("Download Raw Shoot Data"),
+                                             h5("Includes area and height for all replicates of each accession.", style="margin-left:15px"),
+                                             downloadButton('downloadRawData', 'Download Shoot Raw')),
+                                   wellPanel(h4("Download Means Shoot Data"),
+                                             h5("Includes data averaged over replicates of each accession per day.", style="margin-left:15px"),
+                                             downloadButton('downloadData', 'Download Shoot Means'))),
+                            column(4,
                                    img(src="20160822_115928.jpg",
                                        height="100%", width="100%"),
                                    tags$small(
                                      em("Chenopodium quinoa."),
-                                     "Source: Steven Callen, Donald Danforth Plant Science Center"),
+                                     "Source: Steven Callen, Donald Danforth Plant Science Center"))), hr(),
+                          fluidRow(
+                            column(5,
+                                   h4(strong("Panicle Data:")),
+                                   p("Panicles were collected at 111-146 days after germination, according to maturity. Panicles were imaged using a Nikon Coolpix L830 
+                                     camera."),
+                                   p("Panicle shape and density were scored using the descriptors for quinoa established by Bioversity International et al. 2013.")), br(), br(),
+                            column(3,
+                                   wellPanel(h4("Download Panicle Data"),
+                                             h5("Includes panicle density and shape for each accession.", style="margin-left:15px"),
+                                             downloadButton('downloadPan', 'Download Panicle'))),
+                            column(4,
                                    img(src="IMG_4387.jpg",
                                        height="100%", width="100%"),
                                    tags$small(
                                      em("Chenopodium quinoa."),
-                                     "Source: Elizabeth Castillo, Donald Danforth Plant Science Center")))),
+                                     "Source: Elizabeth Castillo, Donald Danforth Plant Science Center"))), hr(),
+                          fluidRow(
+                            column(5,
+                                   h4(strong("Seed Data:")),
+                                   p("Seeds were harvested by rubbing panicles across a 1/8-in mesh screen placed atop an Almaco Air Blast Seed Cleaner. Total seed weight 
+                                      (yield, g) was recorded for each plant. A subset of seeds from each plant was weighed and imaged. The image background consisted of white 
+                                      paper with a 1.27-cm diameter Tough-Spot for use as a size marker. Seed images were processed and analyzed for seed size and color
+                                      using PlantCV, and the number of seeds per image was calculated using R v3.3.3 (2017-03-06)."),
+                                   p("Seed size was normalized by dividing the area of each seed by the area of the size marker. Average seed weight (g/seed) was estimated for each 
+                                      plant by dividing the total weight of the subset of seeds by the number of seeds in the subset. The total number of seeds per plant 
+                                      was then estimated by dividing the yield (g) by the average seed weight (g/seed).")), br(), br(),
+                            column(3,
+                                   wellPanel(h4("Download F1 Seed Data"),
+                                             h5("Includes seed number, normalized area, and weight for each accession.", style="margin-left:15px"),
+                                             downloadButton('downloadSeedG1', 'Download F1 Seed'))),
+                            column(4,
+                                   img(src=".jpg",
+                                       height="100%", width="100%"),
+                                   tags$small(
+                                     em("Chenopodium quinoa."),
+                                     "Source:  Donald Danforth Plant Science Center"))), br()),
                  tabPanel("Shoot",
                           fluidRow(
                             column(3,
@@ -104,10 +134,6 @@ ui <- navbarPage("Quinoa Seed and Shoot Explorer",
                                               conditionalPanel(condition = "input.accessions != 'All' & input.dates == ''", p("NOTE: Select at least one date.")),
                                               conditionalPanel(condition = "input.dates != 'All' & input.accessions == ''", p("NOTE: Select one accession.")),
                                               conditionalPanel(condition = "input.accessions != 'All' & input.dates != 'All'", uiOutput('images'))))))),
-                        tabPanel("Seed",
-                          fluidRow(
-                            column(6,
-                                   p("Quinoa seed data here: boxplots, images below")))),
                         tabPanel("Panicle",
                           fluidRow(
                            column(4,
@@ -126,46 +152,50 @@ ui <- navbarPage("Quinoa Seed and Shoot Explorer",
                                   tags$small("Example", em("Chenopodium quinoa"),
                                              "panicle density images. Courtesy of Elizabeth Castillo, 
                                               Donald Danforth Plant Science Center.")))),
+                       tabPanel("Seed",
+                                fluidRow(
+                                  column(6,
+                                         p("Quinoa seed data here: boxplots, images below")))),
                        tabPanel("Data Comparisons",
-                          fluidRow(
-                            column(3,
-                                   wellPanel(
-                                    h4("Regressions"),
-                                    selectInput("xcol", "X Variable", choices=c("All Seed - Est. Number" = "SeedNum_EstAll",
-                                                                                "All Seed - Yield (g)" = "SeedWT_All_g",
-                                                                                "Est. Fresh Weight" = "FWbiomass",
-                                                                                "Est. Dry Weight" = "DWbiomass",
-                                                                                "Seed Subset - Number" = "SeedNum_Subset",
-                                                                                "Seed Subset - Weight (g)" = "SeedWT_Subset_g",
-                                                                                "Seed Subset - Mean Norm. Area" = "MeanSeedNormArea"), 
-                                                selected = "SeedNum_EstAll", selectize = FALSE),
-                                    selectInput("ycol", "Y Variable", choices=c("All Seed - Est. Number" = "SeedNum_EstAll",
-                                                                                "All Seed - Yield (g)" = "SeedWT_All_g",
-                                                                                "Est. Fresh Weight" = "FWbiomass",
-                                                                                "Est. Dry Weight" = "DWbiomass",
-                                                                                "Seed Subset - Number" = "SeedNum_Subset",
-                                                                                "Seed Subset - Weight (g)" = "SeedWT_Subset_g",
-                                                                                "Seed Subset - Mean Norm. Area" = "MeanSeedNormArea"), 
-                                                selected = "SeedWT_All_g", selectize = FALSE)),
-                                   wellPanel(h4("Download Plot"),
-                                             radioButtons('plotType2', 'Select file type:', choices= c("png", "pdf"), inline=TRUE),
-                                             downloadButton('regressPlot', 'Download'))),
-                            column(5, 
-                                   div(style = "position:relative", 
-                                   plotOutput("plot1", height = 500, click = "plot1_click", brush = brushOpts(id = "plot1_brush"), 
-                                              hover = hoverOpts("plot_hover", delay = 100, delayType = "debounce")),
-                                   uiOutput("hover_info"))),
-                            column(4, div(style="height:100px;",
-                                   h4("Points near click"),
-                                   verbatimTextOutput("click_info"),
-                                   h4("Brushed points"),
-                                   verbatimTextOutput("brush_info")))),
-                          fluidRow(
-                            column(5, offset = 3,
-                                   h4("Correlation Summary"),
-                                   verbatimTextOutput("corSummary"),
-                                   h4("Regression Model Summary"),
-                                   verbatimTextOutput("modelSummary")))))
+                                fluidRow(
+                                  column(3,
+                                         wellPanel(
+                                          h4("Regressions"),
+                                          selectInput("xcol", "X Variable", choices=c("All Seed - Est. Number" = "SeedNum_EstAll",
+                                                                                      "All Seed - Yield (g)" = "SeedWT_All_g",
+                                                                                      "Est. Fresh Weight" = "FWbiomass",
+                                                                                      "Est. Dry Weight" = "DWbiomass",
+                                                                                      "Seed Subset - Number" = "SeedNum_Subset",
+                                                                                      "Seed Subset - Weight (g)" = "SeedWT_Subset_g",
+                                                                                      "Seed Subset - Mean Norm. Area" = "MeanSeedNormArea"), 
+                                                      selected = "SeedNum_EstAll", selectize = FALSE),
+                                          selectInput("ycol", "Y Variable", choices=c("All Seed - Est. Number" = "SeedNum_EstAll",
+                                                                                      "All Seed - Yield (g)" = "SeedWT_All_g",
+                                                                                      "Est. Fresh Weight" = "FWbiomass",
+                                                                                      "Est. Dry Weight" = "DWbiomass",
+                                                                                      "Seed Subset - Number" = "SeedNum_Subset",
+                                                                                      "Seed Subset - Weight (g)" = "SeedWT_Subset_g",
+                                                                                      "Seed Subset - Mean Norm. Area" = "MeanSeedNormArea"), 
+                                                      selected = "SeedWT_All_g", selectize = FALSE)),
+                                         wellPanel(h4("Download Plot"),
+                                                   radioButtons('plotType2', 'Select file type:', choices= c("png", "pdf"), inline=TRUE),
+                                                   downloadButton('regressPlot', 'Download'))),
+                                  column(5, 
+                                         div(style = "position:relative", 
+                                         plotOutput("plot1", height = 500, click = "plot1_click", brush = brushOpts(id = "plot1_brush"), 
+                                                    hover = hoverOpts("plot_hover", delay = 100, delayType = "debounce")),
+                                         uiOutput("hover_info"))),
+                                  column(4, div(style="height:100px;",
+                                         h4("Points near click"),
+                                         verbatimTextOutput("click_info"),
+                                         h4("Brushed points"),
+                                         verbatimTextOutput("brush_info")))),
+                                fluidRow(
+                                  column(5, offset = 3,
+                                         h4("Correlation Summary"),
+                                         verbatimTextOutput("corSummary"),
+                                         h4("Regression Model Summary"),
+                                         verbatimTextOutput("modelSummary")))))
 
 
 #### server
@@ -233,6 +263,22 @@ server <- function(input, output) {
     filename = "cqPanicle.csv",
     content = function(file) {
       write.csv(panicle, file, row.names=F)
+    }
+  )
+
+  #download G0 data
+  output$downloadSeedG0 <- downloadHandler(
+    filename = "cqSeedGen0_area.csv",
+    content = function(file) {
+      write.csv(seed.0, file, row.names=F)
+    }
+  )
+  
+  #download G1 data
+  output$downloadSeedG1 <- downloadHandler(
+    filename = "cqSeedGen1_area.csv",
+    content = function(file) {
+      write.csv(seed.1, file, row.names=F)
     }
   )
   
