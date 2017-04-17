@@ -92,11 +92,11 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                              h5("Includes seed number, normalized area, and weight for each accession.", style="margin-left:15px"),
                                              downloadButton('downloadSeedG1', 'Download F1 Seed'))),
                             column(4,
-                                   img(src=".jpg",
+                                   img(src="IMG_0010.jpg",
                                        height="100%", width="100%"),
                                    tags$small(
                                      em("Chenopodium quinoa."),
-                                     "Source:  Donald Danforth Plant Science Center"))), br()),
+                                     "Source: Steven Callen, Donald Danforth Plant Science Center"))), br()),
                  tabPanel("Shoot",
                           fluidRow(
                             column(3,
