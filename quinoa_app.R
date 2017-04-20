@@ -23,23 +23,41 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                  theme = shinytheme("spacelab"),
                  tabPanel("About",
                           fluidRow(
-                            column(9,
+                            column(6,
                                    h4(strong("Germplasm:")),
                                    p("A total of 383 quinoa lines were obtained from the USDA Germplasm Research Information Network National Plant Germplasm System,
                                       from Leibniz-Institut Fur Pflanzengenetik Und Kulturpflanzenforschung (IPK) seed bank, and from collaborators at Washington State 
                                       University (Kevin Murphy) and Brigham Young University (Jeff Maughan and Rick Jellen). All seeds from each line were imaged using 
-                                      a Nikon Coolpix L830 camera. Images were then processed and analyzed for seed area and color using PlantCV (Fahlgren et al. 2015)."),
+                                      a Nikon Coolpix L830 camera. Images were then processed and analyzed for seed area and color using PlantCV (Fahlgren et al. 2015).")), 
+                            column(1),
+                            column(4,
+                                   img(src="example-images/20160822_115928.jpg",
+                                       height="100%", width="100%"),
+                                   tags$small(
+                                     em("Chenopodium quinoa."),
+                                     "Source: Steven Callen, Donald Danforth Plant Science Center"))),hr(),
+                          fluidRow(
+                            column(6,
+                                   h4(strong("F0 Seed:")),
+                                   p(" Seeds from each of the 383 quinoa lines were imaged using a Nikon Coolpix L830 camera. Images were then processed and analyzed for seed area 
+                                     and color using PlantCV (Fahlgren et al. 2015)."),
                                    p("Fifty of these accessions were selected as a diversity panel to examine differences in shoot growth and seed production among quinoa
                                      varieties. Accessions were selected based on country of origin, elevation, and seed color and size. After germination, six seedlings 
                                      per accession were transplanted into 4-in pots containing a Pro-Mix FPX soil medium and then grown in a greenhouse at 24-28C, 20-80% 
-                                     RH, and ~14.5-hr day length.")), br(), br(),
-                            column(3,
-                                   wellPanel(h4("Download F0 Seed Data"),
-                                             h5("Includes normalized area of each seed from each accession.", style="margin-left:15px"),
-                                             downloadButton('downloadSeedG0', 'Download F0 Seed')))), hr(),
+                                     RH, and ~14.5-hr day length."), 
+                                  wellPanel(h4("Download F0 Seed Data"),
+                                            h5("Includes normalized area of each seed from each accession.", style="margin-left:10px"),
+                                            downloadButton('downloadSeedG0', 'F0 Seed Data'))),br(), br(),
+                            column(1),
+                            column(4,
+                                   img(src="example-images/Cq0268.00.jpg",
+                                       height="100%", width="100%"),
+                                   tags$small(
+                                     em("Chenopodium quinoa."),
+                                     "Source: Michael Miller and Monica Tessman, Donald Danforth Plant Science Center"))), hr(),
                           fluidRow(
-                            column(5,
-                                   h4(strong("Shoot Data:")),
+                            column(6,
+                                   h4(strong("Shoot Data (50 Accessions):")),
                                    p("Plants were imaged using RaspberryPis about every other day for seven days. Images of quinoa shoots were taken simultaneously from four 
                                       camera angles: three side views and one top view. Images were processed and analyzed for area and height above bound using PlantCV. 
                                       Above-ground fresh- and dry-weight biomass (g) were estimated from linear regression models of shoot area (cm^2) and height (cm). 
@@ -47,30 +65,29 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                       pixel area from all four camera angles and 'all_ht' is the mean of above-ground plant pixel height from all camera angles. Model for 
                                       dry-weight (adjusted R^2 = 0.742): DW = 8.684e-06(sides_area) + 2.723e-05(area_top), where 'sides_area' is the sum area of all three 
                                       sides and 'area-top' is the area from top camera angle only."),
-                                   p("The heatmap presented is generated from data averaged over all replicates per time point and scaled by row.")), br(), br(),
-                            column(3,
-                                   wellPanel(h4("Download Raw Shoot Data"),
-                                             h5("Includes area and height for all replicates of each accession.", style="margin-left:15px"),
-                                             downloadButton('downloadRawData', 'Download Shoot Raw')),
-                                   wellPanel(h4("Download Means Shoot Data"),
-                                             h5("Includes data averaged over replicates of each accession per day.", style="margin-left:15px"),
-                                             downloadButton('downloadData', 'Download Shoot Means'))),
+                                   p("The heatmap presented is generated from data averaged over all replicates per time point and scaled by row."), 
+                                   wellPanel(h4("Download Raw or Mean Shoot Data"),
+                                             h5("Raw data includes area and height for all replicates of each accession.
+                                                Mean data is averaged over replicates of each accession per day.", style="margin-left:15px"),
+                                             downloadButton('downloadRawData', 'Raw Shoot Data'),
+                                             downloadButton('downloadData', 'Mean Shoot Data'))),br(), br(),
+                            column(1),
                             column(4,
-                                   img(src="example-images/20160822_115928.jpg",
+                                   img(src="example-images/IMG_2812.jpg",
                                        height="100%", width="100%"),
                                    tags$small(
                                      em("Chenopodium quinoa."),
-                                     "Source: Steven Callen, Donald Danforth Plant Science Center"))), hr(),
+                                     "Source: Malia Gehan, Donald Danforth Plant Science Center"))), hr(),
                           fluidRow(
-                            column(5,
-                                   h4(strong("Panicle Data:")),
+                            column(6,
+                                   h4(strong("Panicle Data (50 Accessions):")),
                                    p("Panicles were collected at 111-146 days after germination, according to maturity. Panicles were imaged using a Nikon Coolpix L830 
                                      camera."),
-                                   p("Panicle shape and density were scored using the descriptors for quinoa established by Bioversity International et al. 2013.")), br(), br(),
-                            column(3,
-                                   wellPanel(h4("Download Panicle Data"),
-                                             h5("Includes panicle density and shape for each accession.", style="margin-left:15px"),
-                                             downloadButton('downloadPan', 'Download Panicle'))),
+                                   p("Panicle shape and density were scored using the descriptors for quinoa established by Bioversity International et al. 2013."), 
+                                  wellPanel(h4("Download Panicle Data"),
+                                            h5("Includes panicle density and shape for each accession.", style="margin-left:15px"),
+                                            downloadButton('downloadPan', 'Panicle Data'))),br(), br(),
+                            column(1),
                             column(4,
                                    img(src="example-images/IMG_4387.jpg",
                                        height="100%", width="100%"),
@@ -78,19 +95,19 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                      em("Chenopodium quinoa."),
                                      "Source: Elizabeth Castillo, Donald Danforth Plant Science Center"))), hr(),
                           fluidRow(
-                            column(5,
-                                   h4(strong("Seed Data:")),
+                            column(6,
+                                   h4(strong("F1 Seed Data (50 Accessions):")),
                                    p("Seeds were harvested by rubbing panicles across a 1/8-in mesh screen placed atop an Almaco Air Blast Seed Cleaner. Total seed weight 
                                       (yield, g) was recorded for each plant. A subset of seeds from each plant was weighed and imaged. The image background consisted of white 
                                       paper with a 1.27-cm diameter Tough-Spot for use as a size marker. Seed images were processed and analyzed for seed size and color
                                       using PlantCV, and the number of seeds per image was calculated using R v3.3.3 (2017-03-06)."),
                                    p("Seed size was normalized by dividing the area of each seed by the area of the size marker. Average seed weight (g/seed) was estimated for each 
                                       plant by dividing the total weight of the subset of seeds by the number of seeds in the subset. The total number of seeds per plant 
-                                      was then estimated by dividing the yield (g) by the average seed weight (g/seed).")), br(), br(),
-                            column(3,
-                                   wellPanel(h4("Download F1 Seed Data"),
-                                             h5("Includes seed number, normalized area, and weight for each accession.", style="margin-left:15px"),
-                                             downloadButton('downloadSeedG1', 'Download F1 Seed'))),
+                                      was then estimated by dividing the yield (g) by the average seed weight (g/seed)."), 
+                                  wellPanel(h4("Download F1 Seed Data"),
+                                            h5("Includes seed number, normalized area, and weight for each accession.", style="margin-left:15px"),
+                                            downloadButton('downloadSeedG1', 'F1 Seed Data'))),br(), br(),
+                            column(1),
                             column(4,
                                    img(src="example-images/IMG_0010.jpg",
                                        height="100%", width="100%"),
@@ -99,11 +116,11 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                      "Source: Steven Callen, Donald Danforth Plant Science Center"))), br()),
                  tabPanel("Shoot",
                           fluidRow(
-                            column(3,
+                            column(12,
                                    wellPanel(
                                      h4("Datasets"),
                                      selectInput('data.choice', 'Select:', c("Height (cm)", "Area (cm^2)", "Modeled fresh weight (g)", "Modeled dry weight (g)"),selectize = FALSE))),
-                            column(9,
+                            column(12,
                                    wellPanel(
                                      h4("Select Dates:"),
                                      h5("Note: Must select >1 date to display heatmap.", style="margin-left:15px"),
