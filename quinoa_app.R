@@ -28,7 +28,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                    p("A total of 383 quinoa lines were obtained from the USDA Germplasm Research Information Network National Plant Germplasm System (GRIN),
                                       Leibniz-Institut Fur Pflanzengenetik Und Kulturpflanzenforschung (IPK) seed bank, and from collaborators at Washington State 
                                       University (Kevin Murphy), and Brigham Young University (Jeff Maughan and Rick Jellen)."),
-                                   p("The following is a brief description of the data collected on the germplasm during our pilot experiment. If you use data or code from Quinoa-Trait
+                                   p("The following is a brief description of the data collected on the germplasm during our 2016 season. If you use data or code from Quinoa Phenotype Explorer
                                       please cite: DOIXXXXXXX"),
                                    p("CITATION INFORMATION HERE"),
                                    p("The code for this repository can be found on", a(href="https://github.com/danforthcenter/quinoa-trait/",target='_blank',"our Github."), 
@@ -44,7 +44,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                      "Source: Steven Callen, Donald Danforth Plant Science Center"))),hr(),
                           fluidRow(
                             column(6,
-                                   h4(strong("F0 Seed:")),
+                                   h4(strong("F0 Seed Phenotyping:")),
                                    p(" Seeds from each of the 383 quinoa lines were imaged using a Nikon Coolpix L830 camera. Images were then processed and analyzed for seed area 
                                      and color using PlantCV ",a(href="http://plantcv.danforthcenter.org/",target='_blank',"(plantcv.danforthcenter.org).")),
                                    p("Fifty of these accessions were selected as a diversity panel to examine differences in shoot growth and seed production among quinoa
@@ -63,7 +63,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                      "Source: Michael Miller and Monica Tessman, Donald Danforth Plant Science Center"))), hr(),
                           fluidRow(
                             column(6,
-                                   h4(strong("Shoot Data (50 Accessions):")),
+                                   h4(strong("Shoot Phenotyping (50 Accessions):")),
                                    p("Plants were imaged in an imaging octacgon with Raspberry Pi computers and cameras every other day for two weeks. Images of quinoa shoots were taken simultaneously from four 
                                       camera angles: three side views and one top view. Images were processed and analyzed for area and height above bound using", 
                                       a(href="http://plantcv.danforthcenter.org/",target='_blank',"PlantCV.")," Above-ground fresh- and dry-weight biomass (g) 
@@ -87,7 +87,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                      "Source: Malia Gehan, Donald Danforth Plant Science Center"))), hr(),
                           fluidRow(
                             column(6,
-                                   h4(strong("Panicle Data (50 Accessions):")),
+                                   h4(strong("Panicle Phenotyping (50 Accessions):")),
                                    p("Panicles were collected at 111-146 days after germination, according to maturity. Panicles were imaged using a Nikon Coolpix L830 
                                      camera."),
                                    p("Panicle shape and density were scored using the descriptors for quinoa established by", 
@@ -105,7 +105,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                      "Source: Elizabeth Castillo, Donald Danforth Plant Science Center"))), hr(),
                           fluidRow(
                             column(6,
-                                   h4(strong("F1 Seed Data (50 Accessions):")),
+                                   h4(strong("F1 Seed Phenotyping (50 Accessions):")),
                                    p("Seeds were harvested by rubbing panicles across a 1/8-in mesh screen placed atop an Almaco Air Blast Seed Cleaner. Total seed weight 
                                       (yield, g) was recorded for each plant. A subset of seeds from each plant was weighed and imaged. The image background consisted of white 
                                       paper with a 1.27-cm diameter Tough-Spot for use as a size marker. Seed images were processed and analyzed for seed size and color
@@ -422,7 +422,7 @@ server <- function(input, output) {
   output$panicle <- DT::renderDataTable(DT::datatable({
     panicle[,c(1,3,5,4)]}, rownames = FALSE,
     options=list(lengthMenu = list(c(10,25,50,-1), c('10','25','50','All')),
-                 pageLength = 10, scrollX = TRUE)))
+                 pageLength = 20, scrollX = TRUE)))
   
 #####################################################################################
 #################################### Comparisons #################################### 
