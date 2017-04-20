@@ -8,15 +8,15 @@ library(ggplot2)
 library(shinythemes)
 
 # load shoot data
-cq.shoot <- read.csv(file="cqShootMean.csv", sep=",", header=TRUE, stringsAsFactors=FALSE) #cq_mean_data
-raw.data <- read.csv(file="cqShootRaw.csv", sep=",", header=TRUE, stringsAsFactors=FALSE) #cqshoot_data_20170114
-images.list <- read.csv(file="cqShootImages.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
+cq.shoot <- read.csv(file="data/cqShootMean.csv", sep=",", header=TRUE, stringsAsFactors=FALSE) #cq_mean_data
+raw.data <- read.csv(file="data/cqShootRaw.csv", sep=",", header=TRUE, stringsAsFactors=FALSE) #cqshoot_data_20170114
+images.list <- read.csv(file="data/cqShootImages.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
 # load panicle data
-panicle <- read.csv(file="cqPanicle.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
+panicle <- read.csv(file="data/cqPanicle.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
 # load seed data
-seed.0 <- read.csv(file="cqSeedGen0_area.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
-seed.1 <- read.csv(file="cqSeedGen1_area.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
-seed.biomass <- read.csv(file="cqSeedBiomass.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
+seed.0 <- read.csv(file="data/cqSeedGen0_area.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
+seed.1 <- read.csv(file="data/cqSeedGen1_area.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
+seed.biomass <- read.csv(file="data/cqSeedBiomass.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
 
 #### user interface
 ui <- navbarPage("Quinoa Phenotype Explorer",
@@ -56,7 +56,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                              h5("Includes data averaged over replicates of each accession per day.", style="margin-left:15px"),
                                              downloadButton('downloadData', 'Download Shoot Means'))),
                             column(4,
-                                   img(src="20160822_115928.jpg",
+                                   img(src="example-images/20160822_115928.jpg",
                                        height="100%", width="100%"),
                                    tags$small(
                                      em("Chenopodium quinoa."),
@@ -72,7 +72,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                              h5("Includes panicle density and shape for each accession.", style="margin-left:15px"),
                                              downloadButton('downloadPan', 'Download Panicle'))),
                             column(4,
-                                   img(src="IMG_4387.jpg",
+                                   img(src="example-images/IMG_4387.jpg",
                                        height="100%", width="100%"),
                                    tags$small(
                                      em("Chenopodium quinoa."),
@@ -92,7 +92,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                              h5("Includes seed number, normalized area, and weight for each accession.", style="margin-left:15px"),
                                              downloadButton('downloadSeedG1', 'Download F1 Seed'))),
                             column(4,
-                                   img(src="IMG_0010.jpg",
+                                   img(src="example-images/IMG_0010.jpg",
                                        height="100%", width="100%"),
                                    tags$small(
                                      em("Chenopodium quinoa."),
@@ -137,7 +137,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                         tabPanel("Panicle",
                           fluidRow(
                            column(4,
-                                 img(src="panicleShape_vert.png",
+                                 img(src="panicle-images/panicleShape_vert.png",
                                      height="100%", width="100%"),
                                  tags$small("Example", em("Chenopodium quinoa"),
                                    "panicle shape images. Courtesy of Elizabeth Castillo, 
@@ -147,7 +147,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                     h4("Panicle Data Table:"),
                                     DT::dataTableOutput('panicle'))),
                            column(4,
-                                  img(src="panicleDens_vert.png",
+                                  img(src="panicle-images/panicleDens_vert.png",
                                       height="100%", width="100%"),
                                   tags$small("Example", em("Chenopodium quinoa"),
                                              "panicle density images. Courtesy of Elizabeth Castillo, 
