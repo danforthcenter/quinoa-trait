@@ -1,3 +1,4 @@
+options(rgl.useNULL=TRUE)
 library(shiny)
 library(d3heatmap)
 library(gplots)
@@ -6,13 +7,19 @@ library(dplyr)
 library(RColorBrewer)
 library(ggplot2)
 library(shinythemes)
+library(scatterplot3d)
+library(rgl)
+library(plotly)
 
 # load shoot data
 cq.shoot <- read.csv(file="data/cqShootMean.csv", sep=",", header=TRUE, stringsAsFactors=FALSE) #cq_mean_data
 raw.data <- read.csv(file="data/cqShootRaw.csv", sep=",", header=TRUE, stringsAsFactors=FALSE) #cqshoot_data_20170114
 images.list <- read.csv(file="data/cqShootImages.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
 # load panicle data
-panicle <- read.csv(file="data/cqPanicle.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
+panicle <- read.csv(file="data/cqPanicle-Yield_20170421.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
+panicle.pca <- read.csv(file="data/panicle_pca_scores.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
+panicle.loading <- read.csv(file="data/panicle_pca_loading.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
+
 # load seed data
 seed.0 <- read.csv(file="data/cqSeedGen0_area.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
 seed.1 <- read.csv(file="data/cqSeedGen1_area.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
@@ -162,22 +169,27 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                               conditionalPanel(condition = "input.accessions != 'All' & input.dates != 'All'", uiOutput('images'))))))),
                         tabPanel("Panicle",
                           fluidRow(
-                           column(4,
-                                 img(src="panicle-images/panicleShape_vert.png",
-                                     height="100%", width="100%"),
-                                 tags$small("Example", em("Chenopodium quinoa"),
-                                   "panicle shape images. Courtesy of Elizabeth Castillo, 
-                                   Donald Danforth Plant Science Center.")),
-                           column(4,
-                                  wellPanel(
-                                    h4("Panicle Data Table:"),
-                                    DT::dataTableOutput('panicle'))),
-                           column(4,
-                                  img(src="panicle-images/panicleDens_vert.png",
-                                      height="100%", width="100%"),
-                                  tags$small("Example", em("Chenopodium quinoa"),
-                                             "panicle density images. Courtesy of Elizabeth Castillo, 
-                                              Donald Danforth Plant Science Center.")))),
+                            column(12,
+                                   radioButtons("paniclebuttons",label=h4("Color By"), 
+                                                choices=list("Harvest Day"=0, "Density"=1,"Shape"=2,"Yield"=3 ),inline=TRUE)),
+                            column(12,
+                                   p(plotlyOutput("panicle.plot",height="800px"))), 
+                            column(4,
+                                   img(src="panicle-images/panicleShape_vert.png",
+                                       height="100%", width="100%"),
+                                   tags$small("Example", em("Chenopodium quinoa"),
+                                              "panicle shape images. Courtesy of Elizabeth Castillo, 
+                                              Donald Danforth Plant Science Center.")),
+                            column(4,
+                                   wellPanel(
+                                     h4("Panicle Data Table:"),
+                                     DT::dataTableOutput('panicle'))),
+                             column(4,
+                                    img(src="panicle-images/panicleDens_vert.png",
+                                        height="100%", width="100%"),
+                                    tags$small("Example", em("Chenopodium quinoa"),
+                                               "panicle density images. Courtesy of Elizabeth Castillo, 
+                                               Donald Danforth Plant Science Center.")))),
                        tabPanel("Seed",
                                 fluidRow(
                                   column(6,
@@ -417,10 +429,45 @@ server <- function(input, output) {
 #####################################################################################
 
 ###################################### Panicle ###################################### 
-
+  
+  panicle.graph<-reactive({
+  
+    if(input$paniclebuttons==0){
+    colorby=~DaysAtHarvest
+    }
+    
+    if(input$paniclebuttons==1){
+      colorby=~as.factor(Density)
+    }
+    
+    if(input$paniclebuttons==2){
+      colorby=~as.factor(Shape)
+    }
+    
+    if(input$paniclebuttons==3){
+      colorby=~SeedWT_All_g
+    }
+  
+    p <- plot_ly(panicle.pca, x = ~PC1, y = ~PC2, z = ~PC3, color=colorby,
+                 marker = list(symbol = 'circle'),
+                 text = ~paste('Genotype:', Genotype,'<br>Harvest Day',DaysAtHarvest ,'<br>Yield:', SeedWT_All_g, '<br>Density:', Density,
+                               '<br>Shape:', Shape))%>%
+      add_markers() %>%
+      layout(title = 'Panicle Phenotype Principal Components',
+             scene = list(xaxis = list(title = 'PC1'),
+                          yaxis = list(title = 'PC2'),
+                          zaxis = list(title = 'PC3'),height = 1000, units="px"))
+    })
+  
+  output$panicle.plot<-{
+    renderPlotly({
+      panicle.graph()
+    })
+  }
+  
   #output panicle table
   output$panicle <- DT::renderDataTable(DT::datatable({
-    panicle[,c(1,3,5,4)]}, rownames = FALSE,
+    panicle[,c(1,3,5,6,4)]}, rownames = FALSE,
     options=list(lengthMenu = list(c(10,25,50,-1), c('10','25','50','All')),
                  pageLength = 20, scrollX = TRUE)))
   
@@ -520,6 +567,12 @@ server <- function(input, output) {
               labs(x = input$xcol, y = input$ycol) + theme(axis.title=element_text(size=15), axis.text = element_text(size=12)))
         dev.off()
         })
+  
+  tags$style(type="text/css",
+             ".shiny-output-error { visibility: hidden; }",
+             ".shiny-output-error:before { visibility: hidden; }"
+  )
+  
 }
 
 ##Shinyapp
