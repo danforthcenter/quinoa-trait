@@ -10,6 +10,7 @@ library(shinythemes)
 library(scatterplot3d)
 library(rgl)
 library(plotly)
+library(gridExtra)
 
 # load shoot data
 cq.shoot <- read.csv(file="data/cqShootMean.csv", sep=",", header=TRUE, stringsAsFactors=FALSE) #cq_mean_data
@@ -133,6 +134,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                  tabPanel("Shoot",
                           fluidRow(
                             column(12,
+                                   h4("Graph Shoot Data and View Images"),
                                    wellPanel(
                                      h4("Datasets"),
                                      selectInput('data.choice', 'Select:', c("Height (cm)", "Area (cm^2)", "Modeled fresh weight (g)", "Modeled dry weight (g)"),selectize = FALSE))),
@@ -170,10 +172,11 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                         tabPanel("Panicle",
                           fluidRow(
                             column(12,
-                                   radioButtons("paniclebuttons",label=h4("Color By"), 
-                                                choices=list("Harvest Day"=0, "Density"=1,"Shape"=2,"Yield"=3 ),inline=TRUE)),
+                                   h4("Graph Panicle Data"),
+                                   radioButtons("paniclebuttons",label=h4("Color By:"), 
+                                               c("Harvest Day"=0, "Density"=1,"Shape"=2,"Yield"=3 ),inline=TRUE)),
                             column(12,
-                                   p(plotlyOutput("panicle.plot",height="800px"))), 
+                                   p(plotlyOutput("panicle.plot",height="800px"))),
                             column(4,
                                    img(src="panicle-images/panicleShape_vert.png",
                                        height="100%", width="100%"),
@@ -192,8 +195,22 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                                Donald Danforth Plant Science Center.")))),
                        tabPanel("Seed",
                                 fluidRow(
-                                  column(6,
-                                         p("Quinoa seed data here: boxplots, images below")))),
+                                  column(12,
+                                        h4("Graph Seed Data and View Images"),
+                                        wellPanel(
+                                          h4("Generation 0"),
+                                          DT::dataTableOutput('seed.0'),
+                                          p(plotOutput('seed0.plot')),
+                                          p(plotlyOutput('seed0.pca'))),
+                                        wellPanel(
+                                          h4("Generation 1"),
+                                          DT::dataTableOutput('seed.1'),
+                                          p(plotOutput('seed1.plot')),
+                                          p(plotlyOutput('seed1.pca'))),
+                                        wellPanel(
+                                          h4("Comparison of Generation 0 and 1 Seed Size"),
+                                          p(plotOutput('seed1.0.plot')),
+                                          p(plotlyOutput('seed1.0.pca')))))),
                        tabPanel("Data Comparisons",
                                 fluidRow(
                                   column(3,
@@ -447,23 +464,42 @@ server <- function(input, output) {
     if(input$paniclebuttons==3){
       colorby=~SeedWT_All_g
     }
-  
-    p <- plot_ly(panicle.pca, x = ~PC1, y = ~PC2, z = ~PC3, color=colorby,
-                 marker = list(symbol = 'circle'),
-                 text = ~paste('Genotype:', Genotype,'<br>Harvest Day',DaysAtHarvest ,'<br>Yield:', SeedWT_All_g, '<br>Density:', Density,
-                               '<br>Shape:', Shape))%>%
-      add_markers() %>%
+    
+    print(panicle.loading$PC1)
+    
+    p<-plot_ly()%>%
+      add_trace(data=panicle.loading, x=~PC1[1:2],y=~PC2[1:2],z=~PC3[1:2], color='red', mode='lines')%>%
+      add_text(data=panicle.loading, x=~PC1[1],y=~PC2[1],z=~PC3[1], color='red',text="Harvest Day")%>%
+      add_markers(data=panicle.loading, x=~PC1[1],y=~PC2[1],z=~PC3[1], color='red',marker=list(symbol="square"))%>%
+      add_trace(data=panicle.loading,x=~PC1[3:4],y=~PC2[3:4],z=~PC3[3:4], color='blue', mode='lines')%>%
+      add_text(data=panicle.loading, x=~PC1[3],y=~PC2[3],z=~PC3[3], color='blue', text="Yield")%>%
+      add_markers(data=panicle.loading, x=~PC1[3],y=~PC2[3],z=~PC3[3], color='blue', marker=list(symbol="square"))%>%
+      add_trace(data=panicle.loading,x=~PC1[5:6],y=~PC2[5:6],z=~PC3[5:6], color='purple', mode='lines')%>%
+      add_text(data=panicle.loading, x=~PC1[5],y=~PC2[5],z=~PC3[5], color='purple', text="Density")%>%
+      add_markers(data=panicle.loading, x=~PC1[5],y=~PC2[5],z=~PC3[5], color='purple', marker=list(symbol="square"))%>%
+      add_trace(data=panicle.loading,x=~PC1[7:8],y=~PC2[7:8],z=~PC3[7:8], color='orange', mode='lines')%>%
+      add_text(data=panicle.loading, x=~PC1[7],y=~PC2[7],z=~PC3[7], color='orange', text="Shape")%>%
+      add_markers(data=panicle.loading, x=~PC1[7],y=~PC2[7],z=~PC3[7], color='orange',  marker=list(symbol="square"))%>%
+      add_markers(data=panicle.pca, x = ~PC1, y = ~PC2, z = ~PC3, color=colorby,
+                                marker = list(symbol = 'circle'),
+                                text = ~paste('Genotype:', Genotype,'<br>Harvest Day',DaysAtHarvest ,'<br>Yield:', SeedWT_All_g, '<br>Density:', Density,
+                                              '<br>Shape:', Shape))%>%
       layout(title = 'Panicle Phenotype Principal Components',
-             scene = list(xaxis = list(title = 'PC1'),
-                          yaxis = list(title = 'PC2'),
-                          zaxis = list(title = 'PC3'),height = 1000, units="px"))
+              scene = list(xaxis = list(title = 'PC1'),
+                           yaxis = list(title = 'PC2'),
+                           zaxis = list(title = 'PC3'),height = 800, units="px"))
+  
+    
     })
   
   output$panicle.plot<-{
     renderPlotly({
       panicle.graph()
+      #add_trace(data=panicle.loading, x=1, y=1, z=1, type="scatter3d", mode="markers")
+      #add_trace(line, x = line$PC1, y = line$PC2, z = line$PC3, type = 'scatter3d', mode = 'lines', line = list(color = 'rgb(1, 1, 1)', width = 1 , dash = 'dash', width = 4)) 
     })
   }
+  
   
   #output panicle table
   output$panicle <- DT::renderDataTable(DT::datatable({
