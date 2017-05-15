@@ -12,19 +12,25 @@ library(rgl)
 library(plotly)
 library(gridExtra)
 
+
 # load shoot data
-cq.shoot <- read.csv(file="data/cqShootMean.csv", sep=",", header=TRUE, stringsAsFactors=FALSE) #cq_mean_data
-raw.data <- read.csv(file="data/cqShootRaw.csv", sep=",", header=TRUE, stringsAsFactors=FALSE) #cqshoot_data_20170114
-images.list <- read.csv(file="data/cqShootImages.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
+cq.shoot<-readRDS('data/cqShootMean.rds')
+raw.data<-readRDS('data/cqShootRaw.rds')
+images.list<-readRDS('data/cqShootImage.rds')
+
 # load panicle data
-panicle <- read.csv(file="data/cqPanicle-Yield_20170421.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
-panicle.pca <- read.csv(file="data/panicle_pca_scores.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
-panicle.loading <- read.csv(file="data/panicle_pca_loading.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
+panicle<-readRDS('data/cqPanicle-Yield_20170421.rds')
+panicle.pca<-readRDS('data/panicle_pca_scores.rds')
+panicle.loading<-readRDS('data/panicle_pca_loading.rds')
 
 # load seed data
-seed.0 <- read.csv(file="data/cqSeedGen0_area.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
-seed.1 <- read.csv(file="data/cqSeedGen1_area.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
-seed.biomass <- read.csv(file="data/cqSeedBiomass.csv", sep=",", header=TRUE, stringsAsFactors=FALSE)
+gen0.seed.area<-readRDS('data/gen0.filtered_seed_biomass_hsv.rds')
+gen0.seed.color<-readRDS('data/gen0_agg_seed_pca_scores.rds')
+
+#load comparison data
+seed.0<-readRDS("data/cqSeedGen0_area.rds")
+seed.1<-readRDS("data/cqSeedGen1_area.rds")
+seed.biomass<-readRDS("data/cqSeedBiomass.rds")
 
 #### user interface
 ui <- navbarPage("Quinoa Phenotype Explorer",
@@ -137,7 +143,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                    h4("Graph Shoot Data and View Images"),
                                    wellPanel(
                                      h4("Datasets"),
-                                     selectInput('data.choice', 'Select:', c("Height (cm)", "Area (cm^2)", "Modeled fresh weight (g)", "Modeled dry weight (g)"),selectize = FALSE))),
+                                     selectInput('data.choice', 'Select:', c("Height (cm)", "Area (cm^2)", "Modeled fresh weight (g)", "Modeled dry weight (g)"),selected="Height (cm)",selectize = FALSE))),
                             column(12,
                                    wellPanel(
                                      h4("Select Dates:"),
@@ -152,7 +158,10 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                      checkboxGroupInput("accessions", "Accessions", c("All", unique(cq.shoot$Genotype)), selected = "All", inline=TRUE))),
                             column(12,
                                    tabsetPanel(
-                                     tabPanel("Heatmap", column(9, d3heatmapOutput('heatmap', height="700px")), br(),
+                                     tabPanel("Heatmap", 
+                                              column(9, 
+                                                     h4(textOutput("heatmap.title")),
+                                                     d3heatmapOutput('heatmap', height="700px")), br(),
                                               column(3, wellPanel(h4("Heatmap Colors"),
                                                                   selectInput("palette", "Palette:", c("Greens", "Blues", "Purples", "YlGn", "YlOrRd", "RdYlBu", "RdYlGn")))),
                                               column(3, wellPanel(h4("Download Heatmap"),
@@ -175,8 +184,14 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                    h4("Graph Panicle Data"),
                                    radioButtons("paniclebuttons",label=h4("Color By:"), 
                                                c("Harvest Day"=0, "Density"=1,"Shape"=2,"Yield"=3 ),inline=TRUE)),
-                            column(12,
-                                   p(plotlyOutput("panicle.plot",height="800px"))),
+                            column(6,
+                                   wellPanel(
+                                   p(plotlyOutput("panicle.plot",height="800px")))),
+                            column(6,
+                                   wellPanel(
+                                   p(verbatimTextOutput('panicle.image.selected')),
+                                   uiOutput(outputId = "panicle.image"))),
+                            column(12),
                             column(4,
                                    img(src="panicle-images/panicleShape_vert.png",
                                        height="100%", width="100%"),
@@ -196,21 +211,35 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                        tabPanel("Seed",
                                 fluidRow(
                                   column(12,
-                                        h4("Graph Seed Data and View Images"),
-                                        wellPanel(
-                                          h4("Generation 0"),
-                                          DT::dataTableOutput('seed.0'),
-                                          p(plotOutput('seed0.plot')),
-                                          p(plotlyOutput('seed0.pca'))),
-                                        wellPanel(
-                                          h4("Generation 1"),
-                                          DT::dataTableOutput('seed.1'),
-                                          p(plotOutput('seed1.plot')),
-                                          p(plotlyOutput('seed1.pca'))),
-                                        wellPanel(
-                                          h4("Comparison of Generation 0 and 1 Seed Size"),
-                                          p(plotOutput('seed1.0.plot')),
-                                          p(plotlyOutput('seed1.0.pca')))))),
+                                         wellPanel(
+                                           h4("Generation 0"),
+                                           p("Phenotyping data collected on seed stocks from USDA, IPK, and collaborators. If a genotype appears more than once it indicates that 
+                                             the genotype was acquired from more than one source."))),
+                                  column(6,
+                                         wellPanel(
+                                         p(plotlyOutput('seed0.plot',height="800px")))),
+                                  column(6,
+                                         wellPanel(
+                                         p(verbatimTextOutput('seed0.image.selected')),
+                                         uiOutput(outputId = "seed0.image"))),
+                                  column(12),
+                                  column(6,
+                                         wellPanel(
+                                         p(plotlyOutput('seed0.pca',height="800px")))),
+                                  column(6,
+                                         wellPanel(
+                                         p(verbatimTextOutput('seed0.pca.selected')),
+                                         uiOutput(outputId = "seed0.pca.image"))),
+                                  column(12,
+                                          DT::dataTableOutput('seed.area.0'))),
+                                  column(12,
+                                         wellPanel(
+                                           h4("Generation 1"),
+                                           p("Seed color and seed area phenotype data collected on the ~50 accessions that were shoot and panicle phenotyped"))),
+                                column(12,
+                                       wellPanel(
+                                         h4("Generation 0 and Generation 1 Comparisons"),
+                                         p("How have seed area and seed color changed from generation 0 to generation 1")))),
                        tabPanel("Data Comparisons",
                                 fluidRow(
                                   column(3,
@@ -254,7 +283,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
 
 
 #### server
-server <- function(input, output) {
+server <- function(input, output,session) {
 
 ################################### SHOOT ###########################################
   #Table
@@ -352,11 +381,24 @@ server <- function(input, output) {
     cq.t <- t(cq.explode)
   })
   
+  
+  #heatmap title
+  
+  output$heatmap.title<-({renderText(paste(input$data.choice))})
+  
   #display heatmap
+  plot.heatmap<-({
   output$heatmap <- renderD3heatmap({
     d3heatmap(heatmap(), dendrogram ="none", colors=input$palette,
               xaxis_font_size = "9pt", yaxis_font_size = "9pt")
-  })
+  })})
+  
+  observeEvent(input$data.choice,{
+      withProgress(message = 'Making plot', value =NULL, {
+        incProgress()
+        plot.heatmap()
+      })
+    })
   
   #downloading heatmap
   output$downloadPlot <- downloadHandler(
@@ -442,7 +484,80 @@ server <- function(input, output) {
 #####################################################################################
 
 ####################################### SEED ######################################## 
-# Malia
+
+  seed0.area.graph<-reactive({
+    p2 <- plot_ly(gen0.seed.area, x = ~hum.name, y = ~normalized.area, type = "box", color=~as.factor(country), source="seed0.area.click",
+                  colors = c("blue","magenta","navy","palevioletred","darkgreen","red","chartreuse","mediumspringgreen","brown","darkorange","yellow","darkorchid","cyan")) %>%
+      layout(title = "Chenopodium quinoa Seed Size",
+             margin = list(b = 100, t=50),
+             dragmode = "zoom",
+             yaxis = list(title = "Mean Normalized Seed Size"),
+             xaxis = list(title = "Genotype", categoryarray=~hum.name,categoryorder="array"))  
+  })
+  
+  output$seed0.plot<-{
+    renderPlotly({
+      seed0.area.graph()
+    })}
+  
+
+  output$seed0.image.selected <- renderPrint({
+    d <- event_data("plotly_click", source="seed0.area.click")
+    geno<-unique(d$x)
+    meansize<-gen0.seed.area[gen0.seed.area$hum.name==geno,]$mean.norm.area[1]
+    if (is.null(d)) "Click Barchart of Seed size to See image, You may need to zoom in" 
+    else paste("The image selected is: ",unique(d$x)," average normalized seed size is ",meansize,sep="")
+  })
+  
+  output$seed0.image<-renderUI({
+    d<-event_data("plotly_click", source="seed0.area.click")
+    geno<-unique(d$x)
+    image.name<-paste("seed-images/gen0/",gen0.seed.area[gen0.seed.area$hum.name==geno,]$plantbarcode[1],"_downsized.jpg",sep="")
+    print(image.name)
+    if(image.name=="seed-images/gen0/NA_downsized.jpg"){tags$img(src = "seed-images/blankseedimg_downsized.jpg", height="500")}else{tags$img(src = image.name, height="500")}
+  })
+  
+  seed0.color.pca<-reactive({
+    
+    p<-plot_ly(source="seed0.pca.click")%>%
+      add_markers(data=gen0.seed.color, x = ~PC1, y = ~PC2, z = ~PC3, color=~as.factor(country),
+                  colors = c("blue","magenta","navy","palevioletred","darkgreen","red","chartreuse","mediumspringgreen","brown","darkorange","yellow","darkorchid","cyan"),
+                  marker = list(symbol = 'circle'), showlegend=TRUE,
+                  text = ~paste('Genotype:', hum.name,'<br>Norm. Mean Area',norm_area ,'<br>Country:', country))%>%
+      layout(title = 'Seed Color',
+             scene = list(xaxis = list(title = 'PC1'),
+                          yaxis = list(title = 'PC2'),
+                          zaxis = list(title = 'PC3'),
+                          height = 800, units="px"))
+  })
+  
+  output$seed0.pca<-{
+    renderPlotly({
+      seed0.color.pca()
+    })}
+  
+  
+  output$seed0.pca.selected <- renderPrint({
+    d <- event_data("plotly_click", source="seed0.pca.click")
+    if(is.null(d)){ "Click PCA of Seed Color to See image"}
+    else{key<-signif(d$z,6)
+    gen0.seed.color$key<-signif(gen0.seed.color$PC3,6)
+    geno<-gen0.seed.color[gen0.seed.color$key==key,]$hum.name
+    paste("The image selected is: ",geno,sep="")}
+  })
+  
+  output$seed0.pca.image<-renderUI({
+    d <- event_data("plotly_click", source="seed0.pca.click")
+    if(is.null(d)){image.name="seed-images/gen0/NA.00_downsized.jpg"}
+    else{key<-signif(d$z,6)
+    gen0.seed.color$key<-signif(gen0.seed.color$PC3,6)
+    geno<-gen0.seed.color[gen0.seed.color$key==key,]$genotype
+    filename<-paste("./www/seed-images/gen0/",geno,".00_downsized.jpg",sep="")
+    image.name<-paste("seed-images/gen0/",geno,".00_downsized.jpg",sep="")
+    print(image.name)}
+    if(image.name=="seed-images/gen0/NA.00_downsized.jpg"){tags$img(src = "seed-images/blankseedimg_downsized.jpg", height="500")}
+    else{tags$img(src = image.name, height="500")}
+  })
 #####################################################################################
 
 ###################################### Panicle ###################################### 
@@ -451,55 +566,73 @@ server <- function(input, output) {
   
     if(input$paniclebuttons==0){
     colorby=~DaysAtHarvest
+    namelab='Harvest Day'
     }
     
     if(input$paniclebuttons==1){
       colorby=~as.factor(Density)
+      namelab=~as.factor(density.h)
     }
     
     if(input$paniclebuttons==2){
       colorby=~as.factor(Shape)
+      namelab=~as.factor(shape.h)
     }
     
     if(input$paniclebuttons==3){
       colorby=~SeedWT_All_g
+      namelab='Yield'
     }
     
-    print(panicle.loading$PC1)
+    Sys.setlocale(locale="C")
     
-    p<-plot_ly()%>%
-      add_trace(data=panicle.loading, x=~PC1[1:2],y=~PC2[1:2],z=~PC3[1:2], color='red', mode='lines')%>%
-      add_text(data=panicle.loading, x=~PC1[1],y=~PC2[1],z=~PC3[1], color='red',text="Harvest Day")%>%
-      add_markers(data=panicle.loading, x=~PC1[1],y=~PC2[1],z=~PC3[1], color='red',marker=list(symbol="square"))%>%
-      add_trace(data=panicle.loading,x=~PC1[3:4],y=~PC2[3:4],z=~PC3[3:4], color='blue', mode='lines')%>%
-      add_text(data=panicle.loading, x=~PC1[3],y=~PC2[3],z=~PC3[3], color='blue', text="Yield")%>%
-      add_markers(data=panicle.loading, x=~PC1[3],y=~PC2[3],z=~PC3[3], color='blue', marker=list(symbol="square"))%>%
-      add_trace(data=panicle.loading,x=~PC1[5:6],y=~PC2[5:6],z=~PC3[5:6], color='purple', mode='lines')%>%
-      add_text(data=panicle.loading, x=~PC1[5],y=~PC2[5],z=~PC3[5], color='purple', text="Density")%>%
-      add_markers(data=panicle.loading, x=~PC1[5],y=~PC2[5],z=~PC3[5], color='purple', marker=list(symbol="square"))%>%
-      add_trace(data=panicle.loading,x=~PC1[7:8],y=~PC2[7:8],z=~PC3[7:8], color='orange', mode='lines')%>%
-      add_text(data=panicle.loading, x=~PC1[7],y=~PC2[7],z=~PC3[7], color='orange', text="Shape")%>%
-      add_markers(data=panicle.loading, x=~PC1[7],y=~PC2[7],z=~PC3[7], color='orange',  marker=list(symbol="square"))%>%
-      add_markers(data=panicle.pca, x = ~PC1, y = ~PC2, z = ~PC3, color=colorby,
-                                marker = list(symbol = 'circle'),
-                                text = ~paste('Genotype:', Genotype,'<br>Harvest Day',DaysAtHarvest ,'<br>Yield:', SeedWT_All_g, '<br>Density:', Density,
-                                              '<br>Shape:', Shape))%>%
+    p<-plot_ly(source="panicle.pca.click")%>%
+      add_trace(data=panicle.loading, x=~PC1[1:2],y=~PC2[1:2],z=~PC3[1:2], color='red', mode='lines', type='scatter3d', showlegend=FALSE)%>%
+      add_text(data=panicle.loading, x=~PC1[1],y=~PC2[1],z=~PC3[1], color='red',text="Harvest Day", showlegend=FALSE)%>%
+      add_trace(data=panicle.loading,x=~PC1[3:4],y=~PC2[3:4],z=~PC3[3:4], color='blue', mode='lines', type='scatter3d', showlegend=FALSE)%>%
+      add_text(data=panicle.loading, x=~PC1[3],y=~PC2[3],z=~PC3[3], color='blue', text="Yield", showlegend=FALSE)%>%
+      add_trace(data=panicle.loading,x=~PC1[5:6],y=~PC2[5:6],z=~PC3[5:6], color='purple', mode='lines', type='scatter3d', showlegend=FALSE)%>%
+      add_text(data=panicle.loading, x=~PC1[5],y=~PC2[5],z=~PC3[5], color='purple', text="Density", showlegend=FALSE)%>%
+      add_trace(data=panicle.loading,x=~PC1[7:8],y=~PC2[7:8],z=~PC3[7:8], color='orange', mode='lines', type='scatter3d', showlegend=FALSE)%>%
+      add_text(data=panicle.loading, x=~PC1[7],y=~PC2[7],z=~PC3[7], color='orange', text="Shape", showlegend=FALSE)%>%
+      add_markers(data=panicle.pca, x = ~PC1, y = ~PC2, z = ~PC3, color=colorby, name=namelab,
+                                marker = list(symbol = 'circle'), showlegend=TRUE,
+                                text = ~paste('Genotype:', Genotype,'<br>Harvest Day',DaysAtHarvest ,'<br>Yield (g):', SeedWT_All_g, '<br>Density:', density.h,
+                                              '<br>Shape:', shape.h))%>%
       layout(title = 'Panicle Phenotype Principal Components',
               scene = list(xaxis = list(title = 'PC1'),
                            yaxis = list(title = 'PC2'),
-                           zaxis = list(title = 'PC3'),height = 800, units="px"))
+                           zaxis = list(title = 'PC3'),
+                           height = 800, units="px"))
   
     
     })
+  
   
   output$panicle.plot<-{
     renderPlotly({
       panicle.graph()
-      #add_trace(data=panicle.loading, x=1, y=1, z=1, type="scatter3d", mode="markers")
-      #add_trace(line, x = line$PC1, y = line$PC2, z = line$PC3, type = 'scatter3d', mode = 'lines', line = list(color = 'rgb(1, 1, 1)', width = 1 , dash = 'dash', width = 4)) 
     })
   }
   
+  output$panicle.image.selected <- renderPrint({
+    d <- event_data("plotly_click", source="panicle.pca.click")
+    linenum<-unique(d$pointNumber)
+    geno<-panicle.pca[linenum+1,]$Genotype
+    if (is.null(d)) "Click Barchart of Seed size to See image, You may need to zoom in" 
+    else paste("The image selected is: ",geno,sep="")
+  })
+  
+  output$panicle.image<-renderUI({
+    d <- event_data("plotly_click", source="panicle.pca.click")
+    linenum<-unique(d$pointNumber)
+    geno<-panicle.pca[linenum+1,]$ID
+    image.name<-paste("panicle-images/",geno,"_downsized.jpg",sep="")
+    filename<-paste("./www/panicle-images/",geno,"_downsized.jpg",sep="")
+    if(image.name=="panicle-images/_downsized.jpg"){tags$img(src = "panicle-images/blankpanicle_downsized.jpg", height="500")}
+    else if(!file.exists(filename)){tags$img(src = "panicle-images/missing.panicle_downsized.jpg", height="500")}
+    else{tags$img(src = image.name, height="500")}
+  })
   
   #output panicle table
   output$panicle <- DT::renderDataTable(DT::datatable({
