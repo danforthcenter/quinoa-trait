@@ -27,6 +27,9 @@ panicle.loading<-readRDS('data/panicle_pca_loading.rds')
 gen0.seed.area<-readRDS('data/gen0.filtered_seed_biomass_hsv.rds')
 gen0.seed.color<-readRDS('data/gen0_agg_seed_pca_scores.rds')
 
+gen1.seed.area<-readRDS('data/gen1.filtered_seed_biomass_hsv.rds')
+gen1.seed.color<-readRDS('data/gen1.pca.color.scores.rds')
+
 #load comparison data
 seed.0<-readRDS("data/cqSeedGen0_area.rds")
 seed.1<-readRDS("data/cqSeedGen1_area.rds")
@@ -231,15 +234,28 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                          p(verbatimTextOutput('seed0.pca.selected')),
                                          uiOutput(outputId = "seed0.pca.image"))),
                                   column(12,
-                                          DT::dataTableOutput('seed.area.0'))),
-                                  column(12,
                                          wellPanel(
                                            h4("Generation 1"),
                                            p("Seed color and seed area phenotype data collected on the ~50 accessions that were shoot and panicle phenotyped"))),
+                                  column(6,
+                                         wellPanel(
+                                           p(plotlyOutput('seed1.plot',height="800px")))),
+                                  column(6,
+                                         wellPanel(
+                                           p(verbatimTextOutput('seed1.image.selected')),
+                                           uiOutput(outputId = "seed1.image"))),
+                                  column(12),
+                                  column(6,
+                                         wellPanel(
+                                           p(plotlyOutput('seed1.pca',height="800px")))),
+                                  column(6,
+                                         wellPanel(
+                                           p(verbatimTextOutput('seed1.pca.selected')),
+                                           uiOutput(outputId = "seed1.pca.image"))),
                                 column(12,
                                        wellPanel(
                                          h4("Generation 0 and Generation 1 Comparisons"),
-                                         p("How have seed area and seed color changed from generation 0 to generation 1")))),
+                                         p("How have seed area and seed color changed from generation 0 to generation 1"))))),
                        tabPanel("Data Comparisons",
                                 fluidRow(
                                   column(3,
@@ -536,7 +552,6 @@ server <- function(input, output,session) {
       seed0.color.pca()
     })}
   
-  
   output$seed0.pca.selected <- renderPrint({
     d <- event_data("plotly_click", source="seed0.pca.click")
     if(is.null(d)){ "Click PCA of Seed Color to See image"}
@@ -558,6 +573,81 @@ server <- function(input, output,session) {
     if(image.name=="seed-images/gen0/NA.00_downsized.jpg"){tags$img(src = "seed-images/blankseedimg_downsized.jpg", height="500")}
     else{tags$img(src = image.name, height="500")}
   })
+  
+  
+  seed1.area.graph<-reactive({
+    p2 <- plot_ly(gen1.seed.area, x = ~hum.rep, y = ~normalized.area, type = "box", color=~as.factor(country), source="seed1.area.click",
+                  colors = c("blue","navy","darkgreen","chartreuse","mediumspringgreen","darkorchid","cyan")) %>%
+      layout(title = "Chenopodium quinoa Seed Size",
+             margin = list(b = 100, t=50),
+             dragmode = "zoom",
+             yaxis = list(title = "Mean Normalized Seed Size"),
+             xaxis = list(title = "Genotype", categoryarray=~hum.rep,categoryorder="array"))  
+  })
+  
+  output$seed1.plot<-{
+    renderPlotly({
+      seed1.area.graph()
+    })}
+  
+  
+  output$seed1.image.selected <- renderPrint({
+    d <- event_data("plotly_click", source="seed1.area.click")
+    geno<-unique(d$x)
+    print(length(unique(gen1.seed.area$hum.rep)))
+    meansize<-gen1.seed.area[gen1.seed.area$hum.rep==geno,]$mean.norm.area[1]
+    if (is.null(d)) "Click Barchart of Seed size to See image, You may need to zoom in" 
+    else paste("The image selected is: ",unique(d$x)," average normalized seed size is ",meansize,sep="")
+  })
+  
+  output$seed1.image<-renderUI({
+    d<-event_data("plotly_click", source="seed1.area.click")
+    geno<-unique(d$x)
+    image.name<-paste("seed-images/gen1/",gen1.seed.area[gen1.seed.area$hum.rep==geno,]$plantbarcode[1],"_downsized.jpg",sep="")
+    print(image.name)
+    print(gen1.seed.area[gen1.seed.area$hum.rep==geno,]$plantbarcode)
+    if(image.name=="seed-images/gen1/NA_downsized.jpg"){tags$img(src = "seed-images/blankseedimg_downsized.jpg", height="500")}else{tags$img(src = image.name, height="500")}
+  })
+  
+  seed1.color.pca<-reactive({
+    
+    p<-plot_ly(source="seed1.pca.click")%>%
+      add_markers(data=gen1.seed.color, x = ~PC1, y = ~PC2, z = ~PC3, color=~as.factor(country),
+                  colors = c("blue","navy","darkgreen","chartreuse","mediumspringgreen","darkorchid","cyan"),
+                  marker = list(symbol = 'circle'), showlegend=TRUE,
+                  text = ~paste('Genotype-Replicate:', hum.rep,'<br>Norm. Mean Area',mean.norm.area ,'<br>Country:', country))%>%
+      layout(title = 'Seed Color',
+             scene = list(xaxis = list(title = 'PC1'),
+                          yaxis = list(title = 'PC2'),
+                          zaxis = list(title = 'PC3'),
+                          height = 800, units="px"))
+  })
+  
+  output$seed1.pca<-{
+    renderPlotly({
+      seed1.color.pca()
+    })}
+  
+  output$seed1.pca.selected <- renderPrint({
+    d <- event_data("plotly_click", source="seed1.pca.click")
+    if(is.null(d)){ "Click PCA of Seed Color to See image"}
+    else{key<-signif(d$z,6)
+    gen1.seed.color$key<-signif(gen1.seed.color$PC3,6)
+    geno<-gen1.seed.color[gen1.seed.color$key==key,]$hum.rep
+    paste("The image selected is: ",geno,sep="")}
+  })
+  
+  output$seed1.pca.image<-renderUI({
+    d <- event_data("plotly_click", source="seed1.pca.click")
+    if(is.null(d)){tags$img(src = "seed-images/blankseedimg_downsized.jpg", height="500")}
+    else{key<-signif(d$z,6)
+    gen1.seed.color$key<-signif(gen1.seed.color$PC3,6)
+    geno<-gen1.seed.color[gen1.seed.color$key==key,]$plantbarcode
+    filename<-paste("./www/seed-images/gen1/",geno,"_downsized.jpg",sep="")
+    image.name<-paste("seed-images/gen1/",geno,"_downsized.jpg",sep="")
+    tags$img(src = image.name, height="500")}
+  })
+
 #####################################################################################
 
 ###################################### Panicle ###################################### 
