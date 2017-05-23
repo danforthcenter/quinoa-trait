@@ -149,20 +149,22 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                        the genotype was acquired from more than one source."))),
                             column(6,
                                    wellPanel(
-                                     p(plotlyOutput('seed0.plot',height="850px")))),
+                                     p(plotlyOutput('seed0.plot',height="900px")))),
                             column(6,
                                    wellPanel(
                                      p(verbatimTextOutput('seed0.image.selected')),
                                      uiOutput(outputId = "seed0.image"),
+                                     h4("Generation 0 Seed Area Data:"),
                                      DT::dataTableOutput('seed0.table'))),
                             column(12),
                             column(6,
                                    wellPanel(
-                                     p(plotlyOutput('seed0.pca',height="850px")))),
+                                     p(plotlyOutput('seed0.pca',height="900px")))),
                             column(6,
                                    wellPanel(
                                      p(verbatimTextOutput('seed0.pca.selected')),
                                      uiOutput(outputId = "seed0.pca.image"),
+                                     h4("Generation 0 Color PCA Data:"),
                                      DT::dataTableOutput('seed0.pca.table'))),
                             column(12,
                                    wellPanel(
@@ -170,20 +172,22 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                      p("Seed color and seed area phenotype data collected on the ~50 accessions that were shoot and panicle phenotyped"))),
                             column(6,
                                    wellPanel(
-                                     p(plotlyOutput('seed1.plot',height="850px")))),
+                                     p(plotlyOutput('seed1.plot',height="900px")))),
                             column(6,
                                    wellPanel(
                                      p(verbatimTextOutput('seed1.image.selected')),
                                      uiOutput(outputId = "seed1.image"),
+                                     h4("Generation 1 Seed Area Data:"),
                                      DT::dataTableOutput('seed1.table'))),
                             column(12),
                             column(6,
                                    wellPanel(
-                                     p(plotlyOutput('seed1.pca',height="850px")))),
+                                     p(plotlyOutput('seed1.pca',height="900px")))),
                             column(6,
                                    wellPanel(
                                      p(verbatimTextOutput('seed1.pca.selected')),
                                      uiOutput(outputId = "seed1.pca.image"),
+                                     h4("Generation 1 Color PCA Data:"),
                                      DT::dataTableOutput('seed1.pca.table'))))),
                  tabPanel("Shoot",
                           fluidRow(
@@ -234,23 +238,22 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                                c("Harvest Day"=0, "Density"=1,"Shape"=2,"Yield"=3 ),inline=TRUE)),
                             column(6,
                                    wellPanel(
-                                   p(plotlyOutput("panicle.plot",height="800px")))),
+                                   p(plotlyOutput("panicle.plot",height="900px")))),
                             column(6,
                                    wellPanel(
                                    p(verbatimTextOutput('panicle.image.selected')),
-                                   uiOutput(outputId = "panicle.image"))),
-                            column(12),
-                            column(4,
+                                   uiOutput(outputId = "panicle.image"),
+                                   h4("Panicle Data Table:"),
+                                   DT::dataTableOutput('panicle'))),
+                            column(12,
+                                   h4("Scoring Key:")),
+                            column(6,
                                    img(src="panicle-images/panicleShape_vert.png",
                                        height="100%", width="100%"),
                                    tags$small("Example", em("Chenopodium quinoa"),
                                               "panicle shape images. Courtesy of Elizabeth Castillo, 
                                               Donald Danforth Plant Science Center.")),
-                            column(4,
-                                   wellPanel(
-                                     h4("Panicle Data Table:"),
-                                     DT::dataTableOutput('panicle'))),
-                             column(4,
+                             column(6,
                                     img(src="panicle-images/panicleDens_vert.png",
                                         height="100%", width="100%"),
                                     tags$small("Example", em("Chenopodium quinoa"),
@@ -749,7 +752,7 @@ server <- function(input, output,session) {
   output$panicle <- DT::renderDataTable(DT::datatable({
     panicle[,c(1,3,5,6,4)]}, rownames = FALSE,
     options=list(lengthMenu = list(c(10,25,50,-1), c('10','25','50','All')),
-                 pageLength = 20, scrollX = TRUE)))
+                 pageLength = 5, scrollX = TRUE)))
   
 #####################################################################################
 #################################### Comparisons #################################### 
