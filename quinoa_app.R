@@ -220,38 +220,42 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                              the genotype was acquired from more than one source."))),
                                   column(6,
                                          wellPanel(
-                                         p(plotlyOutput('seed0.plot',height="800px")))),
+                                         p(plotlyOutput('seed0.plot',height="850px")))),
                                   column(6,
                                          wellPanel(
                                          p(verbatimTextOutput('seed0.image.selected')),
-                                         uiOutput(outputId = "seed0.image"))),
+                                         uiOutput(outputId = "seed0.image"),
+                                         DT::dataTableOutput('seed0.table'))),
                                   column(12),
                                   column(6,
                                          wellPanel(
-                                         p(plotlyOutput('seed0.pca',height="800px")))),
+                                         p(plotlyOutput('seed0.pca',height="850px")))),
                                   column(6,
                                          wellPanel(
                                          p(verbatimTextOutput('seed0.pca.selected')),
-                                         uiOutput(outputId = "seed0.pca.image"))),
+                                         uiOutput(outputId = "seed0.pca.image"),
+                                         DT::dataTableOutput('seed0.pca.table'))),
                                   column(12,
                                          wellPanel(
                                            h4("Generation 1"),
                                            p("Seed color and seed area phenotype data collected on the ~50 accessions that were shoot and panicle phenotyped"))),
                                   column(6,
                                          wellPanel(
-                                           p(plotlyOutput('seed1.plot',height="800px")))),
+                                           p(plotlyOutput('seed1.plot',height="850px")))),
                                   column(6,
                                          wellPanel(
                                            p(verbatimTextOutput('seed1.image.selected')),
-                                           uiOutput(outputId = "seed1.image"))),
+                                           uiOutput(outputId = "seed1.image"),
+                                           DT::dataTableOutput('seed1.table'))),
                                   column(12),
                                   column(6,
                                          wellPanel(
-                                           p(plotlyOutput('seed1.pca',height="800px")))),
+                                           p(plotlyOutput('seed1.pca',height="850px")))),
                                   column(6,
                                          wellPanel(
                                            p(verbatimTextOutput('seed1.pca.selected')),
-                                           uiOutput(outputId = "seed1.pca.image"))))),
+                                           uiOutput(outputId = "seed1.pca.image"),
+                                           DT::dataTableOutput('seed1.pca.table'))))),
                        tabPanel("Data Comparisons",
                                 fluidRow(
                                   column(3,
@@ -529,6 +533,11 @@ server <- function(input, output,session) {
     if(image.name=="seed-images/gen0/NA_downsized.jpg"){tags$img(src = "seed-images/blankseedimg_downsized.jpg", height="500")}else{tags$img(src = image.name, height="500")}
   })
   
+  output$seed0.table <- DT::renderDataTable(DT::datatable({
+    unique(gen0.seed.area[,c(776,777,778,779)])},colnames=c('genotype','country','mean.seed.area','mean.seed.area.sd'), rownames = FALSE,
+    options=list(lengthMenu = list(c(10,25,50,-1), c('10','25','50','All')),
+                 pageLength = 5, scrollX = TRUE)))
+  
   seed0.color.pca<-reactive({
     
     p<-plot_ly(source="seed0.pca.click")%>%
@@ -547,6 +556,11 @@ server <- function(input, output,session) {
     renderPlotly({
       seed0.color.pca()
     })}
+  
+  output$seed0.pca.table <- DT::renderDataTable(DT::datatable({
+    unique(gen0.seed.color[,c(401,403,1,2,3)])}, colnames=c("genotype","country","PC1","PC2","PC3"),rownames = FALSE,
+    options=list(lengthMenu = list(c(10,25,50,-1), c('10','25','50','All')),
+                 pageLength = 5, scrollX = TRUE)))
   
   output$seed0.pca.selected <- renderPrint({
     d <- event_data("plotly_click", source="seed0.pca.click")
@@ -585,6 +599,12 @@ server <- function(input, output,session) {
     renderPlotly({
       seed1.area.graph()
     })}
+  
+
+  output$seed1.table <- DT::renderDataTable(DT::datatable({
+    unique(gen1.seed.area[,c(781,780,777,778)])},colnames=c('genotype','country','mean.seed.area','mean.seed.area.sd'), rownames = FALSE,
+    options=list(lengthMenu = list(c(10,25,50,-1), c('10','25','50','All')),
+                 pageLength = 5, scrollX = TRUE)))
   
   
   output$seed1.image.selected <- renderPrint({
@@ -643,6 +663,11 @@ server <- function(input, output,session) {
     image.name<-paste("seed-images/gen1/",geno,"_downsized.jpg",sep="")
     tags$img(src = image.name, height="500")}
   })
+  
+  output$seed1.pca.table <- DT::renderDataTable(DT::datatable({
+    unique(gen1.seed.color[,c(188,189,1,2,3)])}, colnames=c("genotype","country","PC1","PC2","PC3"),rownames = FALSE,
+    options=list(lengthMenu = list(c(10,25,50,-1), c('10','25','50','All')),
+                 pageLength = 5, scrollX = TRUE)))
 
 #####################################################################################
 
