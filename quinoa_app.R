@@ -251,11 +251,7 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                   column(6,
                                          wellPanel(
                                            p(verbatimTextOutput('seed1.pca.selected')),
-                                           uiOutput(outputId = "seed1.pca.image"))),
-                                column(12,
-                                       wellPanel(
-                                         h4("Generation 0 and Generation 1 Comparisons"),
-                                         p("How have seed area and seed color changed from generation 0 to generation 1"))))),
+                                           uiOutput(outputId = "seed1.pca.image"))))),
                        tabPanel("Data Comparisons",
                                 fluidRow(
                                   column(3,
