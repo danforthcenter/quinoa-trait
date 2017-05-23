@@ -500,8 +500,6 @@ server <- function(input, output,session) {
   }
 
 
-#####################################################################################
-
 ####################################### SEED ######################################## 
 
   seed0.area.graph<-reactive({
@@ -549,9 +547,9 @@ server <- function(input, output,session) {
                   marker = list(symbol = 'circle'), showlegend=TRUE,
                   text = ~paste('Genotype:', hum.name,'<br>Norm. Mean Area',norm_area ,'<br>Country:', country))%>%
       layout(title = 'Seed Color',
-             scene = list(xaxis = list(title = 'PC1'),
-                          yaxis = list(title = 'PC2'),
-                          zaxis = list(title = 'PC3'),
+             scene = list(xaxis = list(title = 'PC1 (POV:21.82%)'),
+                          yaxis = list(title = 'PC2 (POV:14.39%)'),
+                          zaxis = list(title = 'PC3 (POV:6.74%)'),
                           height = 800, units="px"))
   })
   
@@ -636,9 +634,9 @@ server <- function(input, output,session) {
                   marker = list(symbol = 'circle'), showlegend=TRUE,
                   text = ~paste('Genotype-Replicate:', hum.rep,'<br>Norm. Mean Area',mean.norm.area ,'<br>Country:', country))%>%
       layout(title = 'Seed Color',
-             scene = list(xaxis = list(title = 'PC1'),
-                          yaxis = list(title = 'PC2'),
-                          zaxis = list(title = 'PC3'),
+             scene = list(xaxis = list(title = 'PC1 (POV:24.64%)'),
+                          yaxis = list(title = 'PC2 (POV:16.75%)'),
+                          zaxis = list(title = 'PC3 (POV:9.45%)'),
                           height = 800, units="px"))
   })
   
@@ -714,9 +712,9 @@ server <- function(input, output,session) {
                                 text = ~paste('Genotype:', Genotype,'<br>Harvest Day',DaysAtHarvest ,'<br>Yield (g):', SeedWT_All_g, '<br>Density:', density.h,
                                               '<br>Shape:', shape.h))%>%
       layout(title = 'Panicle Phenotype Principal Components',
-              scene = list(xaxis = list(title = 'PC1'),
-                           yaxis = list(title = 'PC2'),
-                           zaxis = list(title = 'PC3'),
+              scene = list(xaxis = list(title = 'PC1 (POV:73.14%)'),
+                           yaxis = list(title = 'PC2 (POV:13.57%)'),
+                           zaxis = list(title = 'PC3 (POV:9.74%)'),
                            height = 800, units="px"))
   
     
