@@ -140,6 +140,51 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                    tags$small(
                                      em("Chenopodium quinoa."),
                                      "Source: Steven Callen, Donald Danforth Plant Science Center"))), br()),
+                 tabPanel("Seed",
+                          fluidRow(
+                            column(12,
+                                   wellPanel(
+                                     h4("Generation 0"),
+                                     p("Phenotyping data collected on seed stocks from USDA, IPK, and collaborators. If a genotype appears more than once it indicates that 
+                                       the genotype was acquired from more than one source."))),
+                            column(6,
+                                   wellPanel(
+                                     p(plotlyOutput('seed0.plot',height="850px")))),
+                            column(6,
+                                   wellPanel(
+                                     p(verbatimTextOutput('seed0.image.selected')),
+                                     uiOutput(outputId = "seed0.image"),
+                                     DT::dataTableOutput('seed0.table'))),
+                            column(12),
+                            column(6,
+                                   wellPanel(
+                                     p(plotlyOutput('seed0.pca',height="850px")))),
+                            column(6,
+                                   wellPanel(
+                                     p(verbatimTextOutput('seed0.pca.selected')),
+                                     uiOutput(outputId = "seed0.pca.image"),
+                                     DT::dataTableOutput('seed0.pca.table'))),
+                            column(12,
+                                   wellPanel(
+                                     h4("Generation 1"),
+                                     p("Seed color and seed area phenotype data collected on the ~50 accessions that were shoot and panicle phenotyped"))),
+                            column(6,
+                                   wellPanel(
+                                     p(plotlyOutput('seed1.plot',height="850px")))),
+                            column(6,
+                                   wellPanel(
+                                     p(verbatimTextOutput('seed1.image.selected')),
+                                     uiOutput(outputId = "seed1.image"),
+                                     DT::dataTableOutput('seed1.table'))),
+                            column(12),
+                            column(6,
+                                   wellPanel(
+                                     p(plotlyOutput('seed1.pca',height="850px")))),
+                            column(6,
+                                   wellPanel(
+                                     p(verbatimTextOutput('seed1.pca.selected')),
+                                     uiOutput(outputId = "seed1.pca.image"),
+                                     DT::dataTableOutput('seed1.pca.table'))))),
                  tabPanel("Shoot",
                           fluidRow(
                             column(12,
@@ -211,51 +256,6 @@ ui <- navbarPage("Quinoa Phenotype Explorer",
                                     tags$small("Example", em("Chenopodium quinoa"),
                                                "panicle density images. Courtesy of Elizabeth Castillo, 
                                                Donald Danforth Plant Science Center.")))),
-                       tabPanel("Seed",
-                                fluidRow(
-                                  column(12,
-                                         wellPanel(
-                                           h4("Generation 0"),
-                                           p("Phenotyping data collected on seed stocks from USDA, IPK, and collaborators. If a genotype appears more than once it indicates that 
-                                             the genotype was acquired from more than one source."))),
-                                  column(6,
-                                         wellPanel(
-                                         p(plotlyOutput('seed0.plot',height="850px")))),
-                                  column(6,
-                                         wellPanel(
-                                         p(verbatimTextOutput('seed0.image.selected')),
-                                         uiOutput(outputId = "seed0.image"),
-                                         DT::dataTableOutput('seed0.table'))),
-                                  column(12),
-                                  column(6,
-                                         wellPanel(
-                                         p(plotlyOutput('seed0.pca',height="850px")))),
-                                  column(6,
-                                         wellPanel(
-                                         p(verbatimTextOutput('seed0.pca.selected')),
-                                         uiOutput(outputId = "seed0.pca.image"),
-                                         DT::dataTableOutput('seed0.pca.table'))),
-                                  column(12,
-                                         wellPanel(
-                                           h4("Generation 1"),
-                                           p("Seed color and seed area phenotype data collected on the ~50 accessions that were shoot and panicle phenotyped"))),
-                                  column(6,
-                                         wellPanel(
-                                           p(plotlyOutput('seed1.plot',height="850px")))),
-                                  column(6,
-                                         wellPanel(
-                                           p(verbatimTextOutput('seed1.image.selected')),
-                                           uiOutput(outputId = "seed1.image"),
-                                           DT::dataTableOutput('seed1.table'))),
-                                  column(12),
-                                  column(6,
-                                         wellPanel(
-                                           p(plotlyOutput('seed1.pca',height="850px")))),
-                                  column(6,
-                                         wellPanel(
-                                           p(verbatimTextOutput('seed1.pca.selected')),
-                                           uiOutput(outputId = "seed1.pca.image"),
-                                           DT::dataTableOutput('seed1.pca.table'))))),
                        tabPanel("Data Comparisons",
                                 fluidRow(
                                   column(3,
